@@ -1,2 +1,2 @@
 # blackbox
-Individual project for demo any integration in stubbing as server side
+Individual project stubbing as server side for demo any integration
