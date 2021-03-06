@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: blackbox
+  thymeleaf:
+    cache: false
+    enabled: false
+    prefix: classpath:templates/
+    suffix: .html
+    security:
+      saml2:
+        network:
+          read-timeout: 10000
+          connect-timeout: 5000
+        service-provider:
+          entity-id: dummybot-saml
+          alias: dummybot-saml
+          sign-metadata: false
+          sign-requests: false
+          want-assertions-signed: true
+          single-logout-enabled: true
+          encrypt-assertions: false
+          name-ids:
+            - urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+            - urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+            - urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+          keys:
+            active:
+              name: sp-signing-key-1
+          providers:
+            - alias: enter-into-dummybot-saml
+              metadata: https://login.microsoftonline.com/a55c55bf-3178-40ba-928b-64abab01bc03/federationmetadata/2007-06/federationmetadata.xml?appid=5ae9518d-3356-499f-b9c7-0679533902dd
+              skip-ssl-validation: true
+              link-text: enter-into-dummybot-saml
+              authentication-request-binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+  datasource:
+    url: jdbc:mysql://localhost:3306/beta?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: dev
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,
+      org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration,
+      org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+  jpa:
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL8Dialect
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        show_sql: true
+        user_sql_comment: true
+
+server:
+  port: 8081
+  ssl:
+    enabled: false
+    key-alias: spring
+    key-store: classpath:saml/keystore.jks
+    key-store-password: secret
+
+logging:
+  level:
+    org:
+      hibernate:
+        type: TRACE
+
