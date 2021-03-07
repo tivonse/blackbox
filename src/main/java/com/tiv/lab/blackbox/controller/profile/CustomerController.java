@@ -1,6 +1,6 @@
 package com.tiv.lab.blackbox.controller.profile;
 
-import com.tiv.lab.blackbox.model.profile.Customer;
+import com.tiv.lab.blackbox.model.Customer;
 import com.tiv.lab.blackbox.service.profile.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1")
 public class CustomerController {
 
-    @Autowired(required = false)
+    @Autowired
     private CustomerService customerService;
 
     @ResponseBody

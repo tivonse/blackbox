@@ -33,18 +33,18 @@ spring:
               link-text: enter-into-dummybot-saml
               authentication-request-binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
   datasource:
-    url: jdbc:mysql://localhost:3306/beta?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-    username: dev
+    url: jdbc:mysql://localhost:3306/poc_under_development?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: poc.dev
     password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,
-      org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration,
-      org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+#  autoconfigure:
+#    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,
+#      org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration,
+#      org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
   jpa:
     hibernate:
       dialect: org.hibernate.dialect.MySQL8Dialect
-      ddl-auto: none
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:

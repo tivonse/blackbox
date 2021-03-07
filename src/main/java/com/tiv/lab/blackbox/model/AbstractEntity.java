@@ -1,29 +1,25 @@
 package com.tiv.lab.blackbox.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 @Data
-@Entity
-@Table(name = "STUBS")
-@AllArgsConstructor
-@NoArgsConstructor
-public class Stub implements Serializable {
+@MappedSuperclass
+public class AbstractEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "user_id", columnDefinition = "VARCHAR(255)")
+    private UUID id;
 
     @CreationTimestamp
     @Column(name = "created_date")

@@ -9,11 +9,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.tiv.lab.blackbox.service.StubService;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -30,13 +28,11 @@ import java.util.List;
 import java.util.Set;
 
 @SpringBootApplication
+//@EnableJpaAuditing
 @EnableCaching
 public class BlackboxApplication implements CommandLineRunner {
 
 	private final static Logger logger = LoggerFactory.getLogger(BlackboxApplication.class);
-
-	@Autowired
-	private StubService stubService;
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 

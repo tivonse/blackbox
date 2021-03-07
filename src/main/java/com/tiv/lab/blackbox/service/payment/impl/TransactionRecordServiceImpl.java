@@ -12,8 +12,12 @@ import java.util.Optional;
 @Service
 public class TransactionRecordServiceImpl implements TransactionRecordService {
 
-    @Autowired(required = false)
     private TransactionRecordRepository transactionRecordRepository;
+
+    @Autowired
+    TransactionRecordServiceImpl(TransactionRecordRepository transactionRecordRepository) {
+        this.transactionRecordRepository = transactionRecordRepository;
+    }
 
     @Override
     public TransactionRecord createTransactionRecord(TransactionRecord transactionRecord) {
