@@ -50,5 +50,8 @@ public class TransactionRecord implements Serializable {
 //
 //    private boolean isExceedingPerDayLimit;
 
+    public TransactionRecord() {
+
+    }
 
 }

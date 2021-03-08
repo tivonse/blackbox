@@ -1,13 +1,11 @@
 package com.tiv.lab.blackbox.model.profile;
 
 import com.tiv.lab.blackbox.model.AbstractEntity;
+import com.tiv.lab.blackbox.model.Customer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -25,5 +23,11 @@ public class CustomerProfile extends AbstractEntity {
 
     private byte[] profileAvatar;
 
+    @OneToOne
+    @JoinColumn(name = "customerId")
+    private Customer customer;
 
+    public CustomerProfile() {
+
+    }
 }

@@ -43,7 +43,8 @@ spring:
 #      org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
   jpa:
     hibernate:
-      dialect: org.hibernate.dialect.MySQL8Dialect
+      dialect: org.hibernate.dialect.MySQL8InnoDBDialect
+#      dialect: org.hibernate.dialect.MySQL8Dialect
       ddl-auto: create-drop
     show-sql: true
     properties:

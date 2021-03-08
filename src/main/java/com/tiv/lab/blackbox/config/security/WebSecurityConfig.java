@@ -4,6 +4,7 @@ import com.tiv.lab.blackbox.security.handler.RedirectLoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,16 +22,19 @@ import javax.sql.DataSource;
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Autowired
+    private DataSource dataSource;
+
 //    @Bean
 //    public RedirectLoginSuccessHandler redirectLoginSuccessHandler() {
 //        return new RedirectLoginSuccessHandler();
 //    }
-//
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-//
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 //    @Bean
 //    public CsrfTokenRepository cookieCsrfTokenRepository() {
 //        return new CookieCsrfTokenRepository();
@@ -94,9 +98,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //    }
 
     @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        // 1st approach to use jdbc authentication directly
+        auth
+                .jdbcAuthentication()
+                .dataSource(dataSource)
+                .passwordEncoder(passwordEncoder())
+                .usersByUsernameQuery(
+                        "SELECT username, password, enabled from users where username = ?"
+                ).authoritiesByUsernameQuery(
+                        "SELECT u.username, a.authority FROM user_authorities a, users u WHERE u.username = ? AND u.user_id = a.user_id");
+
+        // 2nd approach to provide jdbc authentication handler manually in a customization
+//        auth
+//                .authenticationProvider();
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .formLogin(Customizer.withDefaults());
+                .csrf().disable().antMatcher("/user").httpBasic()
+                .and()
+                .formLogin();
+
 //        http
 //                .csrf().disable()
 //                .authorizeRequests()

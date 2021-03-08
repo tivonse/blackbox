@@ -6,6 +6,7 @@ import com.tiv.lab.blackbox.model.profile.CreditProfile;
 import com.tiv.lab.blackbox.model.profile.CustomerProfile;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @Data
 @Table(name = "customers")
 @AllArgsConstructor
+@NoArgsConstructor
 public class Customer extends AbstractEntity {
 
     @Column(name = "customer_id")
@@ -24,14 +26,13 @@ public class Customer extends AbstractEntity {
     @Column(name = "name")
     private String name;
 
-//    @OneToOne
-//    private CustomerProfile customerProfile;
-//
-//    @OneToOne
-//    private CreditProfile creditProfile;
+    @OneToOne(fetch = FetchType.LAZY)
+    private CustomerProfile customerProfile;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private CreditProfile creditProfile;
 
 //    @OneToMany(mappedBy = "transaction_profile_uuid")
 //    private List<TransactionProfile> transactionProfiles;
-
 
 }

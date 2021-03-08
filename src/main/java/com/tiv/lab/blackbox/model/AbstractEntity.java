@@ -18,7 +18,7 @@ public class AbstractEntity implements Serializable {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "user_id", columnDefinition = "VARCHAR(255)")
+    @Column(name = "id", columnDefinition = "VARCHAR(255)")
     private UUID id;
 
     @CreationTimestamp

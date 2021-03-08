@@ -15,6 +15,10 @@ public class TransactionProfile {
     @Id
     private Long id;
 
+    public TransactionProfile() {
+
+    }
+
 //    @ManyToOne
 //    @JoinColumn
 //    private UUID transactionProfileUuid;
