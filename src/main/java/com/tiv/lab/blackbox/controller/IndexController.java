@@ -1,6 +1,7 @@
 package com.tiv.lab.blackbox.controller;
 
 import com.tiv.lab.blackbox.model.AbstractEntity;
+import org.bouncycastle.cert.ocsp.Req;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,16 +31,20 @@ public class IndexController {
     @Autowired
     private SimpleCacheManager simpleCacheManager;
 
-//    @Cacheable("ping")
-    @GetMapping(name = "/ping")
-    @ResponseBody
-    public ResponseEntity<String> ping() {
-        return new ResponseEntity<>("Pong", HttpStatus.OK);
+    @RequestMapping(name = "/samples", method = RequestMethod.GET)
+    public @ResponseBody String sampleResource() {
+        return "resources";
     }
 
+//    @Cacheable("ping")
+//    @GetMapping(name = "/ping")
+//    @ResponseBody
+//    public ResponseEntity<String> ping() {
+//        return new ResponseEntity<>("Pong", HttpStatus.OK);
+//    }
+
     @RequestMapping(value = "/stub/check/{id}", method = RequestMethod.GET)
-    public @ResponseBody
-    AbstractEntity checkStub(@PathVariable Long id) {
+    public @ResponseBody AbstractEntity checkStub(@PathVariable Long id) {
         ConcurrentMapCache result = (ConcurrentMapCache) simpleCacheManager.getCache("getStubById");
         if (result != null && result.get(id) != null) {
             Cache.ValueWrapper cacheValue = result.get(id);

@@ -1,18 +1,20 @@
 package com.tiv.lab.blackbox.config.security;
 
+import com.tiv.lab.blackbox.security.handler.CustomSavedRequestAwareAuthenticationSuccessHandler;
 import com.tiv.lab.blackbox.security.handler.RedirectLoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 
@@ -22,80 +24,44 @@ import javax.sql.DataSource;
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Value("${server.auth.login.redirect.url}")
+    private String DEFAULT_TARGET_LOGIN_REDIRECT_URL = "";
+
+    @Value("${server.auth.logout.redirect.url}")
+    private String DEFAULT_TARGET_LOGOUT_REDIRECT_URL = "";
+
     @Autowired
     private DataSource dataSource;
 
-//    @Bean
-//    public RedirectLoginSuccessHandler redirectLoginSuccessHandler() {
-//        return new RedirectLoginSuccessHandler();
-//    }
+    @Bean
+    public RedirectLoginSuccessHandler redirectLoginSuccessHandler() {
+        return new RedirectLoginSuccessHandler();
+    }
+
+    @Bean
+    public SavedRequestAwareAuthenticationSuccessHandler customSuccessRedirectHandler() {
+        CustomSavedRequestAwareAuthenticationSuccessHandler successHandler = new CustomSavedRequestAwareAuthenticationSuccessHandler();
+        successHandler.setTargetUrlParameter(DEFAULT_TARGET_LOGIN_REDIRECT_URL);
+//        successHandler.setAlwaysUseDefaultTargetUrl(true);
+        return successHandler;
+    }
+
+    @Bean
+    public SimpleUrlLogoutSuccessHandler customSuccessLogoutHandler() {
+        SimpleUrlLogoutSuccessHandler successLogoutHandler = new SimpleUrlLogoutSuccessHandler();
+        successLogoutHandler.setTargetUrlParameter(DEFAULT_TARGET_LOGOUT_REDIRECT_URL);
+        return successLogoutHandler;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-//    @Bean
-//    public CsrfTokenRepository cookieCsrfTokenRepository() {
-//        return new CookieCsrfTokenRepository();
-//    }
-//
-//    @Bean
-//    public DataSource jdbcDataSource() {
-//        return null;
-//    }
-
-//    @Bean
-//    public UserDetailsService users() {
-//        // The builder will ensure the passwords are encoded before saving in memory
-//        User.UserBuilder users = User.builder();
-//        UserDetails user = users
-//                .username("user1")
-//                .password("user1Pass")
-//                .roles("USER")
-//                .build();
-//        UserDetails admin = users
-//                .username("user2")
-//                .password("user2Pass")
-//                .roles("USER", "ADMIN")
-//                .build();
-//        return new InMemoryUserDetailsManager(user, admin);
-//    }
-
-
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//
-//        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-//        manager.createUser(new User.UserBuilder().passwordEncoder(passwordEncoder()).username("user1").password("user1Pass"));
-//    }
-
-//    @Override
-//    protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-//        auth.inMemoryAuthentication()
-//                .withUser("user1").password("user1Pass").roles("USER")
-//                .and()
-//                .withUser("user2").password("user2Pass").roles("USER", "ADMIN");
-//    }
-
-//    @Autowired
-//    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-////        auth.
-////                jdbcAuthentication()
-////                .dataSource(jdbcDataSource())
-////                .withDefaultSchema()
-////                .withUser(User.withUsername("user3").password(passwordEncoder().encode("user3Pass")).roles("USER"));
-//    }
-//
-//    @Override
-//    protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-////        auth.inMemoryAuthentication()
-////                .withUser("user1")
-////                .password(passwordEncoder().encode("{bcrypt}$2y$04$YORA48MCz5towghjXZt0oeQn1IlPPZMlyp.JyaA2KygjKCncdhJ02")).roles("USER")
-////                .and()
-////                .withUser("user2")
-////                .password("user2Pass").roles("USER", "ADMIN");
-//    }
+    @Bean
+    public CsrfTokenRepository cookieCsrfTokenRepository() {
+        return new CookieCsrfTokenRepository();
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -105,9 +71,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .dataSource(dataSource)
                 .passwordEncoder(passwordEncoder())
                 .usersByUsernameQuery(
-                        "SELECT username, password, enabled from users where username = ?"
-                ).authoritiesByUsernameQuery(
-                        "SELECT u.username, a.authority FROM user_authorities a, users u WHERE u.username = ? AND u.user_id = a.user_id");
+                        "SELECT username, password, enabled from users where username = ?")
+                .authoritiesByUsernameQuery(
+                        "SELECT u.username, a.authority FROM user_authorities a, users u WHERE u.username = ? AND u.user_id = a.user_id_fk");
 
         // 2nd approach to provide jdbc authentication handler manually in a customization
 //        auth
@@ -116,18 +82,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable().antMatcher("/user").httpBasic()
-                .and()
-                .formLogin();
 
-//        http
-//                .csrf().disable()
-//                .authorizeRequests()
-//                .antMatchers("/login*").permitAll()
-//                .anyRequest().authenticated()
-//                .and()
-//                .formLogin()
+        http
+                .csrf().disable()
+                .authorizeRequests()
+//                .antMatchers("/**").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+//                .loginPage("/login").permitAll()
+                .successHandler(customSuccessRedirectHandler())
+//                .successForwardUrl("/index")
+//                .defaultSuccessUrl("/")
+                .and()
+                .logout().permitAll()
+                .invalidateHttpSession(true)
+                .logoutSuccessHandler(customSuccessLogoutHandler());
+//                .successHandler(customSuccessRedirectHandler());
 //                .loginPage("/login.html")
 //                .permitAll()
 //                .defaultSuccessUrl("/test.html", true)
