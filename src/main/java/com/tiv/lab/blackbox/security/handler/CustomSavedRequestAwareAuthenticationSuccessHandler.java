@@ -26,7 +26,6 @@ public class CustomSavedRequestAwareAuthenticationSuccessHandler extends SavedRe
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws ServletException, IOException {
-
         String targetUrlParameter = this.getTargetUrlParameter();
         SavedRequest savedRequest = this.requestCache.getRequest(request, response);
         if (savedRequest == null) {

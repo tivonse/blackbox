@@ -1,5 +1,6 @@
 package com.tiv.lab.blackbox.config.security;
 
+import com.tiv.lab.blackbox.security.handler.CustomLogoutSuccessHandler;
 import com.tiv.lab.blackbox.security.handler.CustomSavedRequestAwareAuthenticationSuccessHandler;
 import com.tiv.lab.blackbox.security.handler.RedirectLoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,17 +41,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public SavedRequestAwareAuthenticationSuccessHandler customSuccessRedirectHandler() {
-        CustomSavedRequestAwareAuthenticationSuccessHandler successHandler = new CustomSavedRequestAwareAuthenticationSuccessHandler();
-        successHandler.setTargetUrlParameter(DEFAULT_TARGET_LOGIN_REDIRECT_URL);
+        CustomSavedRequestAwareAuthenticationSuccessHandler successLoginHandler = new CustomSavedRequestAwareAuthenticationSuccessHandler();
+        successLoginHandler.setTargetUrlParameter(DEFAULT_TARGET_LOGIN_REDIRECT_URL);
 //        successHandler.setAlwaysUseDefaultTargetUrl(true);
-        return successHandler;
+        return successLoginHandler;
     }
 
     @Bean
     public SimpleUrlLogoutSuccessHandler customSuccessLogoutHandler() {
-        SimpleUrlLogoutSuccessHandler successLogoutHandler = new SimpleUrlLogoutSuccessHandler();
-        successLogoutHandler.setTargetUrlParameter(DEFAULT_TARGET_LOGOUT_REDIRECT_URL);
-        return successLogoutHandler;
+        return new CustomLogoutSuccessHandler();
     }
 
     @Bean
@@ -90,12 +89,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
+//                .loginPage("classpath:/static/login")
 //                .loginPage("/login").permitAll()
-                .successHandler(customSuccessRedirectHandler())
+//                .successHandler(customSuccessRedirectHandler())
+                .successHandler(redirectLoginSuccessHandler())
 //                .successForwardUrl("/index")
 //                .defaultSuccessUrl("/")
                 .and()
                 .logout().permitAll()
+                .logoutUrl("/logout")
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler(customSuccessLogoutHandler());
 //                .successHandler(customSuccessRedirectHandler());
